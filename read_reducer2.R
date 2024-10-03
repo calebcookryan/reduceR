@@ -10,7 +10,7 @@ species_data = read_excel("/Users/felixlawson/Desktop/stoof/UW/Graduate work/the
 total_reads <- nrow(species_data)
 
 # The time used to determine separate reads 
-tol <- second(0.3)
+tol <- second(5)
 start_index <- 1
 # change time into a format that time can be used algebraically
 prev_time <- as.POSIXct(unlist(species_data[start_index,]["reader_dt"]))
