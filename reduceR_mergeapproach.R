@@ -50,7 +50,7 @@ time_diff <- as.numeric(difftime(bz_readercapture_24_cleaned$reader_dt, midnight
 bz_readercapture_24_cleaned$time_diff <- time_diff
 
 #set time_window for buffer zone around each read
-time_window = 0.3
+time_window = 0.1
 
 #select the data to be included in the network ##need to select as many cols as possible that arent duplicates (only one time col) 
 data<- bz_readercapture_24_cleaned %>%
@@ -72,8 +72,8 @@ reduced_df$reader_dt_reconstructed <- as.POSIXct(reduced_df$reduced_time, origin
 head(bz_readercapture_24_cleaned$reader_dt_reconstructed)
 #size of new dataframe
 nrow(reduced_df)
-#proportion of reads removed followign reduceR
-(nrow(data) - nrow(reduced_df))/nrow(data)
+#proportion of reads removed following reduceR
+ nrow(reduced_df)/nrow(data)
 
 #save
 save(reduced_df, file = "reduced_df.RData")
