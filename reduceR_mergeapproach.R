@@ -54,18 +54,22 @@ time_window = 0.3
 
 #select the data to be included in the network ##need to select as many cols as possible that arent duplicates (only one time col) 
 data<- bz_readercapture_24_cleaned %>%
-  select(reader_pit, genus_species, sex, reader_site2 , time_diff) %>%
+  select(reader_pit, genus, species,genus_species, sex, reader_site2 , time_diff,reader_year,repro_status, capture_year, correct_age,reader_evening_of) %>%
   mutate(start = time_diff - time_window) %>%
   mutate(end = time_diff + time_window) %>%
-  select(reader_pit, genus_species, sex, reader_site2 , start, end) 
+  select(reader_pit, genus, species,genus_species, sex, reader_site2 ,reader_year,repro_status, capture_year, correct_age,reader_evening_of, start, end) 
 
-# Merge overlapping rows in the dataframe ##change this so that it is a single mergedread, maybe dont edit or create a new col
+# Merge overlapping rows in the dataframe ##change this so that it is a single merged read, maybe dont edit or create a new col
 
 reduced_df <- reduceR_overlapping_rows(data)
-#create a col with reduce_time for the average between the start and end of the new readframe
-
+#create a col with reduce_time for the average between the start and end of the new read frame
 reduced_df$reduced_time <- (reduced_df$start+reduced_df$end)/2
 
+# Convert the time difference (in seconds) back to a date-time format
+reduced_df$reader_dt_reconstructed <- as.POSIXct(reduced_df$reduced_time, origin = midnight)
+
+# Display the new column with the reconstructed date-time
+head(bz_readercapture_24_cleaned$reader_dt_reconstructed)
 #size of new dataframe
 nrow(reduced_df)
 #proportion of reads removed followign reduceR
@@ -73,3 +77,6 @@ nrow(reduced_df)
 
 #save
 save(reduced_df, file = "reduced_df.RData")
+write.xlsx(reduced_df, file ="reduced_df.xlsx")
+
+table(reduced_df$species)
