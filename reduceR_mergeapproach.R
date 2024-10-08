@@ -1,7 +1,7 @@
 library(dplyr)
 library(chron)
 library(lubridate)
-load("bz_readercapture_24_cleaned.RDATA")
+#load("bz_readercapture_24_cleaned.RDATA")
 
 ####FOR TIME FILTER
 #Create a function to merge overlapping rows so that if the buffer contains another read the buffer grows to encapsulate it 
@@ -44,19 +44,7 @@ reduceR_overlapping_rows <- function(df) {
 midnight <- as.POSIXct("2022-01-01 00:00:00", format = "%Y-%m-%d %H:%M:%OS")
 
 # Calculate the difference in seconds between each read and midnight (January 1, 2012)
-time_diff <- as.numeric(difftime(bz_readercapture_24_cleaned$reader_dt, midnight, units = "secs"))
-#get the millisecond values from the reader_time col
-time_diff_dec <- (bz_readercapture_24_cleaned$reader_time)
-# Extract the part after the decimal
-after_decimal <- sub(".*\\.(.*)", "\\1", time_diff)
-# Convert the extracted string into a numeric value
-after_decimal_numeric <- as.numeric(after_decimal)/1000
-#add the decimal values 
-full = time_diff + after_decimal_numeric
-
-time_diff = full
-# Add the calculated time difference as a new column
-bz_readercapture_24_cleaned$time_diff <- time_diff
+bz_readercapture_24_cleaned$time_diff <- as.numeric(difftime(bz_readercapture_24_cleaned$reader_dt, midnight, units = "secs"))
 
 #set time_window for buffer zone around each read
 time_window = 0.3
@@ -66,7 +54,7 @@ data<- bz_readercapture_24_cleaned %>%
   select(reader_pit, genus, species,genus_species, sex, spec.location, reader_site1, reader_site2 , reader_sitetype,reader_lat, reader_long, time_diff,reader_year,repro_status, capture_year, correct_age,reader_evening_of, reader_year) %>%
   mutate(start = time_diff - time_window) %>%
   mutate(end = time_diff + time_window) %>%
-  select(reader_pit, genus, species,genus_species, sex, spec.location, reader_site1, reader_site2 , reader_sitetype,reader_lat, reader_long, time_diff,reader_year,repro_status, capture_year, correct_age,reader_evening_of, start,end, reader_year) 
+  select(reader_pit, genus, species,genus_species, sex, spec.location, reader_site1, reader_site2 , reader_sitetype,reader_lat, reader_long,reader_year,repro_status, capture_year, correct_age,reader_evening_of, start, end, reader_year) 
 # Merge overlapping rows in the dataframe ##change this so that it is a single merged read, maybe dont edit or create a new col
 
 reduced_df <- reduceR_overlapping_rows(data)
